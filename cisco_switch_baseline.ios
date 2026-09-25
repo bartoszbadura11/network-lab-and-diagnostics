@@ -1,0 +1,44 @@
+! ==========================================================
+! Cisco IOS L2/L3 Switch & Router Baseline Configuration Lab
+! Author: Bartosz Badura (CCNA R&S / ICT Technician)
+! ==========================================================
+
+enable
+configure terminal
+
+! 1. Hostname & Basic Console Security
+hostname KAT-SW-ACCESS-01
+no ip domain-lookup
+service password-encryption
+
+! 2. VLAN Creation (Data & Management)
+vlan 10
+ name USERS_LAN
+vlan 99
+ name MGMT_NOC
+exit
+
+! 3. Access Port Configuration (End-user workstation)
+interface GigabitEthernet0/1
+ description WORKSTATION_PORT
+ switchport mode access
+ switchport access vlan 10
+ spanning-tree portfast
+ no shutdown
+
+! 4. Trunk Port Configuration (Uplink to Core Switch / Firewall)
+interface GigabitEthernet0/24
+ description UPLINK_TO_CORE_ROUTER
+ switchport mode trunk
+ switchport trunk allowed vlan 10,99
+ no shutdown
+
+! 5. Management SVI & Default Gateway
+interface Vlan99
+ ip address 192.168.99.10 255.255.255.0
+ no shutdown
+exit
+
+ip default-gateway 192.168.99.1
+end
+write memory
